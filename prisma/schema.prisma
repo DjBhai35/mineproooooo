@@ -1,0 +1,394 @@
+// MinePro - Comprehensive Database Schema Foundation
+// PostgreSQL Database Schema for Prisma ORM
+// Configured for authoritative timestamps, high-precision financial decimals,
+// multi-level referral trees, and robust audit logging.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  USER
+  ADMIN
+  SUPER_ADMIN
+  SUPPORT
+}
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+  PENDING_VERIFICATION
+  BANNED
+}
+
+enum PlanStatus {
+  ACTIVE
+  INACTIVE
+  ARCHIVED
+}
+
+enum InvestmentStatus {
+  PENDING
+  ACTIVE
+  COMPLETED
+  CANCELLED
+  EXPIRED
+}
+
+enum CycleStatus {
+  RUNNING
+  ELIGIBLE_FOR_CLAIM
+  CLAIMED
+  MISSED
+  EXPIRED
+}
+
+enum TransactionType {
+  DEPOSIT
+  WITHDRAWAL
+  PLAN_INVESTMENT
+  CYCLE_REWARD
+  REFERRAL_REWARD
+  ADMIN_ADJUSTMENT
+  FEE
+}
+
+enum TransactionStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+  REJECTED
+  CANCELLED
+}
+
+enum PaymentNetwork {
+  TRC20
+  BEP20
+  MANUAL
+}
+
+enum NotificationType {
+  SYSTEM
+  REWARD_CLAIMABLE
+  REWARD_CREDITED
+  DEPOSIT_CONFIRMED
+  WITHDRAWAL_UPDATE
+  REFERRAL_BONUS
+  SECURITY_ALERT
+}
+
+// 1. User Model
+model User {
+  id                 String               @id @default(uuid())
+  email              String               @unique
+  username           String               @unique
+  passwordHash       String
+  fullName           String?
+  phone              String?
+  role               UserRole             @default(USER)
+  status             UserStatus           @default(ACTIVE)
+  referralCode       String               @unique
+  referredById       String?
+  referredBy         User?                @relation("ReferralHierarchy", fields: [referredById], references: [id])
+  directReferrals    User[]               @relation("ReferralHierarchy")
+  
+  twoFactorEnabled   Boolean              @default(false)
+  twoFactorSecret    String?
+  emailVerifiedAt    DateTime?
+  lastLoginAt        DateTime?
+  lastLoginIp        String?
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @updatedAt
+
+  wallet             Wallet?
+  investments        Investment[]
+  transactions       Transaction[]
+  deposits           Deposit[]
+  withdrawals        Withdrawal[]
+  rewardCycles       RewardCycle[]
+  referralsReceived  ReferralReward[]     @relation("BeneficiaryRewards")
+  referralsGenerated ReferralReward[]     @relation("TriggerUserRewards")
+  referralEdgesAsUpline ReferralRelationship[] @relation("UplineUser")
+  referralEdgesAsDownline ReferralRelationship[] @relation("DownlineUser")
+  notifications      Notification[]
+  activityLogs       AdminActivityLog[]
+
+  @@index([email])
+  @@index([referralCode])
+  @@index([referredById])
+  @@index([role, status])
+}
+
+// 2. Mining & Investment Plan Model
+model Plan {
+  id              String           @id @default(uuid())
+  slug            String           @unique
+  name            String
+  tierBadge       String           // e.g., Starter, Basic, Standard, Advanced, Premium
+  colorVariant    String           @default("green") // green or orange
+  minDeposit      Decimal          @db.Decimal(18, 4)
+  maxDeposit      Decimal          @db.Decimal(18, 4)
+  dailyRatePct    Decimal          @db.Decimal(5, 2) // e.g. 2.00, 3.00, 4.00%
+  cycleDurationHours Int           @default(24)
+  durationDays    Int?             // null for Lifetime, or specified days
+  isLifetime      Boolean          @default(true)
+  status          PlanStatus       @default(ACTIVE)
+  features        String[]         @default([])
+  sortOrder       Int              @default(0)
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  investments     Investment[]
+
+  @@index([status, sortOrder])
+}
+
+// 3. User Investment Model
+model Investment {
+  id             String           @id @default(uuid())
+  userId         String
+  user           User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  planId         String
+  plan           Plan             @relation(fields: [planId], references: [id])
+  amount         Decimal          @db.Decimal(18, 4)
+  dailyReward    Decimal          @db.Decimal(18, 4) // Calculated server-side based on plan rate
+  totalEarned    Decimal          @default(0) @db.Decimal(18, 4)
+  claimsCount    Int              @default(0)
+  status         InvestmentStatus @default(ACTIVE)
+  activatedAt    DateTime         @default(now())
+  expiresAt      DateTime?
+  lastClaimAt    DateTime?
+  nextClaimAt    DateTime
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+
+  rewardCycles   RewardCycle[]
+
+  @@index([userId, status])
+  @@index([nextClaimAt])
+}
+
+// 4. Wallet Model (High-precision balance storage)
+model Wallet {
+  id             String           @id @default(uuid())
+  userId         String           @unique
+  user           User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  balance        Decimal          @default(0) @db.Decimal(18, 8)
+  totalDeposited Decimal          @default(0) @db.Decimal(18, 8)
+  totalWithdrawn Decimal          @default(0) @db.Decimal(18, 8)
+  totalInvested  Decimal          @default(0) @db.Decimal(18, 8)
+  totalEarned    Decimal          @default(0) @db.Decimal(18, 8)
+  totalReferral  Decimal          @default(0) @db.Decimal(18, 8)
+  lockedBalance  Decimal          @default(0) @db.Decimal(18, 8)
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+
+  @@index([userId])
+}
+
+// 5. Authoritative 24-Hour Reward Cycle Model
+model RewardCycle {
+  id             String           @id @default(uuid())
+  userId         String
+  user           User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  investmentId   String
+  investment     Investment       @relation(fields: [investmentId], references: [id], onDelete: Cascade)
+  cycleNumber    Int
+  rewardAmount   Decimal          @db.Decimal(18, 8)
+  cycleStartedAt DateTime
+  cycleEndsAt    DateTime         // Server authoritative timestamp for claim eligibility
+  status         CycleStatus      @default(RUNNING)
+  claimReference String?          @unique
+  claimedAt      DateTime?
+  claimedIp      String?
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+
+  @@unique([investmentId, cycleNumber])
+  @@index([userId, status])
+  @@index([cycleEndsAt, status])
+  @@index([claimReference])
+}
+
+// 6. Comprehensive Financial Transaction Ledger
+model Transaction {
+  id              String            @id @default(uuid())
+  reference       String            @unique // Unique TRX reference (e.g., MP-TX-984210)
+  userId          String
+  user            User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type            TransactionType
+  amount          Decimal           @db.Decimal(18, 8)
+  fee             Decimal           @default(0) @db.Decimal(18, 8)
+  netAmount       Decimal           @db.Decimal(18, 8)
+  status          TransactionStatus @default(PENDING)
+  description     String
+  metadata        Json?             // Network info, transaction hash, related IDs
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  deposit         Deposit?
+  withdrawal      Withdrawal?
+
+  @@index([userId, type])
+  @@index([reference])
+  @@index([createdAt])
+}
+
+// 7. Deposit Request & Verification
+model Deposit {
+  id              String            @id @default(uuid())
+  userId          String
+  user            User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactionId   String?           @unique
+  transaction     Transaction?      @relation(fields: [transactionId], references: [id])
+  network         PaymentNetwork
+  amount          Decimal           @db.Decimal(18, 8)
+  toAddress       String
+  fromAddress     String?
+  txHash          String?           @unique
+  status          TransactionStatus @default(PENDING)
+  adminNotes      String?
+  approvedBy      String?
+  approvedAt      DateTime?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  @@index([userId, status])
+  @@index([txHash])
+}
+
+// 8. Withdrawal Request & Approval
+model Withdrawal {
+  id              String            @id @default(uuid())
+  userId          String
+  user            User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactionId   String?           @unique
+  transaction     Transaction?      @relation(fields: [transactionId], references: [id])
+  network         PaymentNetwork
+  amount          Decimal           @db.Decimal(18, 8)
+  fee             Decimal           @db.Decimal(18, 8)
+  netPayout       Decimal           @db.Decimal(18, 8)
+  walletAddress   String
+  txHash          String?
+  status          TransactionStatus @default(PENDING)
+  adminNotes      String?
+  processedBy     String?
+  processedAt     DateTime?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  @@index([userId, status])
+}
+
+// 9. Multi-Level Referral Hierarchy Model (Levels 1 to 5)
+model ReferralRelationship {
+  id              String            @id @default(uuid())
+  uplineUserId    String
+  uplineUser      User              @relation("UplineUser", fields: [uplineUserId], references: [id], onDelete: Cascade)
+  downlineUserId  String
+  downlineUser    User              @relation("DownlineUser", fields: [downlineUserId], references: [id], onDelete: Cascade)
+  level           Int               // 1 = Direct, 2 = 2nd level, up to configured max level (e.g. 5)
+  createdAt       DateTime          @default(now())
+
+  @@unique([uplineUserId, downlineUserId])
+  @@index([uplineUserId, level])
+  @@index([downlineUserId])
+}
+
+// 10. Referral Reward Ledger
+model ReferralReward {
+  id              String            @id @default(uuid())
+  beneficiaryId   String
+  beneficiary     User              @relation("BeneficiaryRewards", fields: [beneficiaryId], references: [id], onDelete: Cascade)
+  triggerUserId   String
+  triggerUser     User              @relation("TriggerUserRewards", fields: [triggerUserId], references: [id], onDelete: Cascade)
+  level           Int               // 1 to 5
+  rewardRatePct   Decimal           @db.Decimal(5, 2)
+  qualifyingAmount Decimal          @db.Decimal(18, 8) // The investment amount that triggered reward
+  rewardAmount    Decimal           @db.Decimal(18, 8)
+  status          TransactionStatus @default(COMPLETED)
+  reference       String?           @unique
+  transactionId   String?
+  qualifyingEventId String?         // Unique ID of qualifying investment/deposit
+  createdAt       DateTime          @default(now())
+
+  @@unique([beneficiaryId, qualifyingEventId, level])
+  @@index([beneficiaryId])
+  @@index([triggerUserId])
+  @@index([reference])
+}
+
+// 11. User Notifications
+model Notification {
+  id              String            @id @default(uuid())
+  userId          String
+  user            User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type            NotificationType
+  title           String
+  message         String
+  isRead          Boolean           @default(false)
+  link            String?
+  createdAt       DateTime          @default(now())
+
+  @@index([userId, isRead])
+}
+
+// 12. Payment Methods & Supported Networks
+model PaymentMethod {
+  id              String            @id @default(uuid())
+  name            String            // e.g., Tether USD (TRC20), Tether USD (BEP20)
+  network         PaymentNetwork
+  symbol          String            @default("USDT")
+  walletAddress   String
+  qrCodeUrl       String?
+  minDeposit      Decimal           @db.Decimal(18, 4)
+  depositFeeRate  Decimal           @default(0) @db.Decimal(5, 2)
+  isActive        Boolean           @default(true)
+  instructions    String?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  @@index([network, isActive])
+}
+
+// 13. Dynamic Centralized System Settings (Admin Configurable)
+model SystemSetting {
+  id              String            @id @default(uuid())
+  key             String            @unique // e.g., 'MIN_DEPOSIT', 'MIN_WITHDRAWAL', 'REFERRAL_L1_PCT'
+  value           String            // JSON stringified value or plain text
+  type            String            @default("string") // string, number, boolean, json
+  category        String            // financial, referral, cycle, security, general
+  label           String
+  description     String?
+  isPublic        Boolean           @default(false) // Whether accessible to client without auth
+  updatedBy       String?
+  updatedAt       DateTime          @updatedAt
+  createdAt       DateTime          @default(now())
+
+  @@index([category])
+}
+
+// 14. Admin Audit & Activity Logs
+model AdminActivityLog {
+  id              String            @id @default(uuid())
+  adminId         String
+  admin           User              @relation(fields: [adminId], references: [id], onDelete: Cascade)
+  action          String            // e.g., "UPDATE_PLAN", "APPROVE_DEPOSIT", "CHANGE_SETTING"
+  entityType      String            // e.g., "Plan", "Deposit", "SystemSetting"
+  entityId        String?
+  previousValue   Json?
+  newValue        Json?
+  ipAddress       String?
+  userAgent       String?
+  createdAt       DateTime          @default(now())
+
+  @@index([adminId])
+  @@index([action])
+  @@index([createdAt])
+}

@@ -1,0 +1,572 @@
+/**
+ * MinePro Design System & Theme Engine
+ * Visual Theme: HIGH-CONTRAST GREEN + ORANGE + BLACK + CONTROLLED WHITE
+ * Premium modern fintech / crypto / mining rewards web application
+ * Built natively upon Bootstrap 5 with deep bespoke styling
+ */
+
+:root {
+  /* Rich & Deep Green Palette (Dominant Identity) */
+  --mp-green-50: #f0fdf4;
+  --mp-green-100: #dcfce7;
+  --mp-green-200: #bbf7d0;
+  --mp-green-300: #86efac;
+  --mp-green-400: #4ade80;
+  --mp-green-500: #22c55e;
+  --mp-green-600: #16a34a;
+  --mp-green-700: #15803d;
+  --mp-green-800: #166534;
+  --mp-green-900: #14532d;
+  --mp-green-950: #071f14;
+
+  /* Rich Forest Environments & Canvas Surfaces (Dark Mode / Sections) */
+  --mp-sidebar-bg: #05140c;
+  --mp-sidebar-surface: #0a2418;
+  --mp-sidebar-hover: #113825;
+  --mp-bg-environment: #f4f7f5;
+  --mp-bg-environment-alt: #e9f2ec;
+  --mp-bg-deep-forest: #071810;
+  --mp-bg-dark-card: #0c261b;
+
+  /* Orange Energy Palette (Key Highlight & Reward Accent) */
+  --mp-orange-50: #fff7ed;
+  --mp-orange-100: #ffedd5;
+  --mp-orange-200: #fed7aa;
+  --mp-orange-400: #fb923c;
+  --mp-orange-500: #f97316;
+  --mp-orange-600: #ea580c;
+  --mp-orange-700: #c2410c;
+  --mp-orange-gradient: linear-gradient(135deg, #fb923c 0%, #f97316 45%, #ea580c 100%);
+  --mp-orange-glow: 0 4px 18px rgba(249, 115, 22, 0.4);
+
+  /* Black Premium Contrast */
+  --mp-black: #060b08;
+  --mp-black-surface: #0e1712;
+  --mp-black-border: #1a2920;
+  --mp-black-hover: #121e17;
+  
+  /* High Contrast Typography - Crisp, Sharp, Anti-Faded */
+  --mp-text-dark: #07150e;
+  --mp-text-body: #1e2e25;
+  --mp-text-muted: #3a5245;
+  --mp-text-subtle: #4d6657;
+  --mp-text-light: #f8fafc;
+  --mp-text-light-muted: #e2e8f0;
+  --mp-text-light-subtle: #cbd5e1;
+
+  /* Controlled White & Crisp Border Surfaces */
+  --mp-white: #ffffff;
+  --mp-surface-subtle: #f8faf9;
+  --mp-border: #cfe5d7;
+  --mp-border-subtle: #e2f0e7;
+  --mp-border-strong: #96d2ac;
+  --mp-border-dark: #1b3d2c;
+
+  /* Unified Typography Font Stack - Plus Jakarta Sans */
+  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-display: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Global Font & Resets */
+body {
+  font-family: var(--font-sans);
+  color: var(--mp-text-body);
+  background-color: var(--mp-bg-environment);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  line-height: 1.6;
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+}
+
+/* High-Contrast Bold Typography Hierarchy */
+h1, h2, h3, h4, h5, h6,
+.h1, .h2, .h3, .h4, .h5, .h6 {
+  color: var(--mp-text-dark);
+  font-weight: 800;
+  letter-spacing: -0.028em;
+  line-height: 1.25;
+}
+
+h1, .h1 {
+  font-size: calc(1.55rem + 2.0vw);
+  font-weight: 800;
+}
+
+h2, .h2 {
+  font-size: calc(1.35rem + 1.2vw);
+  font-weight: 800;
+}
+
+h3, .h3 {
+  font-size: calc(1.2rem + 0.6vw);
+  font-weight: 700;
+}
+
+h4, .h4 {
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+h5, .h5 {
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+h6, .h6 {
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+p {
+  color: var(--mp-text-body);
+  font-size: 1rem;
+  line-height: 1.65;
+}
+
+.text-dark {
+  color: var(--mp-text-dark) !important;
+}
+
+.text-muted {
+  color: var(--mp-text-muted) !important;
+  font-weight: 500;
+}
+
+.text-orange {
+  color: var(--mp-orange-600) !important;
+}
+
+.text-green {
+  color: var(--mp-green-600) !important;
+}
+
+.text-forest {
+  color: var(--mp-green-950) !important;
+}
+
+/* High contrast light text for dark sections */
+.text-light-sharp {
+  color: #ffffff !important;
+}
+
+.text-light-body {
+  color: #e2e8f0 !important;
+}
+
+.text-light-subtle {
+  color: #cbd5e1 !important;
+}
+
+/* Custom Buttons - High Contrast, Strong Presence */
+.btn-minepro-black {
+  background-color: var(--mp-black);
+  color: #ffffff !important;
+  border: 1.5px solid #1b2e23;
+  border-radius: 12px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  padding: 0.72rem 1.65rem;
+  min-height: 44px;
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 14px rgba(6, 11, 8, 0.35);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.btn-minepro-black:hover,
+.btn-minepro-black:focus {
+  background-color: var(--mp-black-hover);
+  border-color: var(--mp-green-500);
+  color: #ffffff !important;
+  box-shadow: 0 8px 24px rgba(6, 11, 8, 0.45), 0 0 16px rgba(34, 197, 94, 0.35);
+  transform: translateY(-2px);
+}
+
+.btn-minepro-orange {
+  background: var(--mp-orange-gradient);
+  color: #ffffff !important;
+  border: 1.5px solid #ea580c;
+  border-radius: 12px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  padding: 0.72rem 1.65rem;
+  min-height: 44px;
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 16px rgba(249, 115, 22, 0.35);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.btn-minepro-orange:hover,
+.btn-minepro-orange:focus {
+  background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+  border-color: #c2410c;
+  color: #ffffff !important;
+  box-shadow: 0 8px 24px rgba(249, 115, 22, 0.5);
+  transform: translateY(-2px);
+}
+
+.btn-minepro-green {
+  background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+  color: #ffffff !important;
+  border: 1.5px solid #16a34a;
+  border-radius: 12px;
+  font-weight: 700;
+  padding: 0.72rem 1.65rem;
+  min-height: 44px;
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 16px rgba(22, 163, 74, 0.32);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.btn-minepro-green:hover,
+.btn-minepro-green:focus {
+  background: linear-gradient(135deg, #15803d 0%, #166534 100%);
+  border-color: #14532d;
+  color: #ffffff !important;
+  box-shadow: 0 8px 24px rgba(22, 163, 74, 0.45);
+  transform: translateY(-2px);
+}
+
+.btn-minepro-outline-orange {
+  background-color: transparent;
+  color: var(--mp-orange-600) !important;
+  border: 2px solid var(--mp-orange-500);
+  border-radius: 12px;
+  font-weight: 700;
+  padding: 0.65rem 1.5rem;
+  min-height: 44px;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.btn-minepro-outline-orange:hover {
+  background-color: var(--mp-orange-500);
+  color: #ffffff !important;
+  box-shadow: 0 6px 18px rgba(249, 115, 22, 0.35);
+  transform: translateY(-2px);
+}
+
+.btn-minepro-outline-green {
+  background-color: transparent;
+  color: var(--mp-green-700) !important;
+  border: 2px solid var(--mp-green-600);
+  border-radius: 12px;
+  font-weight: 700;
+  padding: 0.65rem 1.5rem;
+  min-height: 44px;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.btn-minepro-outline-green:hover {
+  background-color: var(--mp-green-600);
+  color: #ffffff !important;
+  box-shadow: 0 6px 18px rgba(34, 197, 94, 0.3);
+  transform: translateY(-2px);
+}
+
+.btn-minepro-outline-black {
+  background-color: transparent;
+  color: var(--mp-black) !important;
+  border: 2px solid var(--mp-black);
+  border-radius: 12px;
+  font-weight: 700;
+  padding: 0.65rem 1.5rem;
+  min-height: 44px;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.btn-minepro-outline-black:hover {
+  background-color: var(--mp-black);
+  color: #ffffff !important;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(6, 11, 8, 0.25);
+}
+
+/* Premium Controlled Cards */
+.card-minepro {
+  background-color: var(--mp-white);
+  border: 1.5px solid var(--mp-border);
+  border-radius: 18px;
+  box-shadow: 0 4px 18px rgba(7, 26, 17, 0.05);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.card-minepro:hover {
+  border-color: var(--mp-border-strong);
+  box-shadow: 0 12px 32px rgba(7, 26, 17, 0.1);
+  transform: translateY(-2px);
+}
+
+.card-minepro-elevated {
+  background-color: var(--mp-white);
+  border: 2px solid #a8dbbc;
+  border-radius: 20px;
+  box-shadow: 0 16px 40px rgba(7, 32, 20, 0.1);
+}
+
+.card-minepro-green {
+  background: linear-gradient(180deg, #ffffff 0%, #edf9f2 100%);
+  border: 1.5px solid #a8dbbc;
+  border-radius: 18px;
+}
+
+/* High-Contrast Badges */
+.badge-minepro-green {
+  background-color: #dcfce7;
+  color: #14532d;
+  font-weight: 800;
+  padding: 0.45em 0.95em;
+  border-radius: 20px;
+  border: 1.5px solid #86efac;
+  font-size: 0.78rem;
+  letter-spacing: 0.03em;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.badge-minepro-orange {
+  background-color: #ffedd5;
+  color: #9a3412;
+  font-weight: 800;
+  padding: 0.45em 0.95em;
+  border-radius: 20px;
+  border: 1.5px solid #fdba74;
+  font-size: 0.78rem;
+  letter-spacing: 0.03em;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.badge-minepro-black {
+  background-color: var(--mp-black);
+  color: #ffffff;
+  font-weight: 800;
+  padding: 0.45em 0.95em;
+  border-radius: 20px;
+  border: 1.5px solid #1b2e23;
+  font-size: 0.78rem;
+  letter-spacing: 0.03em;
+}
+
+/* Form Controls & Focus */
+.form-control, .form-select {
+  border: 1.5px solid #cbd5e1;
+  border-radius: 12px;
+  padding: 0.75rem 1rem;
+  font-size: 0.95rem;
+  color: var(--mp-text-dark);
+  font-weight: 600;
+  min-height: 46px;
+  background-color: #ffffff;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-control:focus, .form-select:focus {
+  border-color: var(--mp-green-600);
+  box-shadow: 0 0 0 3.5px rgba(22, 163, 74, 0.22);
+  background-color: #ffffff;
+  color: var(--mp-text-dark);
+}
+
+.form-control::placeholder {
+  color: #64748b;
+  font-weight: 400;
+}
+
+/* High-Contrast Tables */
+.table-minepro {
+  --bs-table-bg: transparent;
+  vertical-align: middle;
+}
+
+.table-minepro thead th {
+  background-color: #e8f4ec;
+  color: var(--mp-green-950);
+  font-weight: 800;
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.95rem 1.1rem;
+  border-bottom: 2px solid #bce1ca;
+}
+
+.table-minepro tbody td {
+  padding: 1rem 1.1rem;
+  border-bottom: 1.5px solid #e5f0e9;
+  color: var(--mp-text-dark);
+  font-size: 0.92rem;
+  font-weight: 600;
+}
+
+/* Custom Accordion Styling for MinePro (Bespoke Financial & FAQ theme) */
+.accordion-minepro .accordion-item {
+  background-color: #ffffff;
+  border: 1.5px solid var(--mp-border);
+  border-radius: 14px !important;
+  margin-bottom: 0.85rem;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(7, 26, 17, 0.03);
+  transition: all 0.2s ease;
+}
+
+.accordion-minepro .accordion-item:hover {
+  border-color: var(--mp-border-strong);
+  box-shadow: 0 6px 20px rgba(7, 26, 17, 0.07);
+}
+
+.accordion-minepro .accordion-button {
+  background-color: #ffffff;
+  color: var(--mp-text-dark);
+  font-weight: 700;
+  font-size: 1.05rem;
+  padding: 1.25rem 1.45rem;
+  border: none;
+  box-shadow: none;
+}
+
+.accordion-minepro .accordion-button:not(.collapsed) {
+  background-color: #f0fdf4;
+  color: var(--mp-green-900);
+  border-bottom: 1.5px solid #bbf7d0;
+}
+
+.accordion-minepro .accordion-button::after {
+  filter: brightness(0.2);
+  transition: transform 0.25s ease;
+}
+
+.accordion-minepro .accordion-button:not(.collapsed)::after {
+  filter: invert(34%) sepia(85%) saturate(478%) hue-rotate(93deg) brightness(95%) contrast(92%);
+}
+
+.accordion-minepro .accordion-body {
+  padding: 1.35rem 1.45rem;
+  color: #2c4236;
+  font-size: 0.98rem;
+  font-weight: 500;
+  line-height: 1.7;
+  background-color: #ffffff;
+}
+
+/* Public Cycle Journey Step Cards */
+.cycle-step-card {
+  background-color: #ffffff;
+  border: 1.5px solid var(--mp-border);
+  border-radius: 16px;
+  padding: 1.65rem;
+  position: relative;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  height: 100%;
+}
+
+.cycle-step-card:hover {
+  transform: translateY(-4px);
+  border-color: #4ade80;
+  box-shadow: 0 12px 28px rgba(22, 101, 52, 0.12);
+}
+
+.cycle-step-number {
+  font-family: var(--font-sans);
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--mp-green-700);
+}
+
+/* Document & Policy Article Styles */
+.policy-card {
+  background-color: #ffffff;
+  border: 1.5px solid var(--mp-border);
+  border-radius: 18px;
+  padding: 2.5rem;
+  box-shadow: 0 6px 24px rgba(7, 26, 17, 0.05);
+}
+
+.policy-section-title {
+  color: var(--mp-green-950);
+  font-weight: 800;
+  font-size: 1.3rem;
+  margin-top: 2rem;
+  margin-bottom: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.policy-callout-warning {
+  background-color: #fff7ed;
+  border-left: 5px solid var(--mp-orange-500);
+  border-radius: 8px;
+  padding: 1.15rem 1.35rem;
+  margin: 1.35rem 0;
+  color: #7c2d12;
+  font-weight: 500;
+  border-top: 1px solid #fed7aa;
+  border-right: 1px solid #fed7aa;
+  border-bottom: 1px solid #fed7aa;
+}
+
+.policy-callout-info {
+  background-color: #f0fdf4;
+  border-left: 5px solid var(--mp-green-600);
+  border-radius: 8px;
+  padding: 1.15rem 1.35rem;
+  margin: 1.35rem 0;
+  color: #14532d;
+  font-weight: 500;
+  border-top: 1px solid #bbf7d0;
+  border-right: 1px solid #bbf7d0;
+  border-bottom: 1px solid #bbf7d0;
+}
+
+/* Feature Grid Card Hover Lift */
+.feature-card-lift {
+  background-color: #ffffff;
+  border: 1.5px solid var(--mp-border);
+  border-radius: 16px;
+  padding: 1.85rem 1.5rem;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  height: 100%;
+}
+
+.feature-card-lift:hover {
+  transform: translateY(-4px);
+  border-color: #86efac;
+  box-shadow: 0 12px 28px rgba(7, 31, 20, 0.09);
+}
+
+/* Range input high-contrast styling */
+.form-range::-webkit-slider-thumb {
+  background-color: var(--mp-green-600);
+  box-shadow: 0 0 0 3px #ffffff, 0 2px 8px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+}
+
+.form-range::-moz-range-thumb {
+  background-color: var(--mp-green-600);
+  box-shadow: 0 0 0 3px #ffffff, 0 2px 8px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+}
+
